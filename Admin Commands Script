@@ -1,11 +1,13 @@
---// CMD BAR + COMMANDS PANEL + FLY CONTROLS + EXPANDED COMMANDS
---// Đặt vào StarterPlayer > StarterPlayerScripts
+--// CMD BAR + COMMANDS PANEL + FLY CONTROLS + EXPANDED COMMANDS + VIEW + ANTI-VOID + KEY SYSTEM
+--// Đặt vào Executor Delta của bạn (Mã nguồn Lua thuần 100%, cách dòng thoáng chữ)
+
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local Lighting = game:GetService("Lighting")
+
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local camera = workspace.CurrentCamera
@@ -13,6 +15,7 @@ local camera = workspace.CurrentCamera
 --==================================================
 -- 1. XÓA GUI CŨ & KHỞI TẠO SCREEN GUI
 --==================================================
+
 local oldGui = playerGui:FindFirstChild("CmdBarGui")
 if oldGui then
     oldGui:Destroy()
@@ -24,15 +27,21 @@ gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.Parent = playerGui
 
+-- Cấu hình Key System
+local CORRECT_KEY = "Key_Giv210QtUz_bAuiyT/64&FIX_Giver_/Czsu19r938dj38<Y8282jx*(÷89)"
+local KEY_LINK = "https://link-unlock.com/rdl376nh"
+
 --==================================================
--- 2. KHỞI TẠO GIAO DIỆN CMD BAR
+-- 2. KHỞI TẠO GIAO DIỆN CMD BAR (ẨN BAN ĐẦU)
 --==================================================
+
 local bar = Instance.new("Frame")
 bar.Name = "CmdBar"
 bar.Size = UDim2.new(0, 420, 0, 42)
-bar.Position = UDim2.new(0.5, -210, 0, 18)
+bar.Position = UDim2.new(0.5, -210, 0, -55)
 bar.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
 bar.BorderSizePixel = 0
+bar.Visible = false
 bar.Parent = gui
 
 local barCorner = Instance.new("UICorner")
@@ -40,8 +49,7 @@ barCorner.CornerRadius = UDim.new(0, 10)
 barCorner.Parent = bar
 
 local barStroke = Instance.new("UIStroke")
-barStroke.Color = Color3.fromRGB(80, 85, 100)
-barStroke.Thickness = 1.3
+barStroke.Thickness = 1.8
 barStroke.Parent = bar
 
 local toggle = Instance.new("TextButton")
@@ -72,61 +80,13 @@ box.TextXAlignment = Enum.TextXAlignment.Left
 box.Parent = bar
 
 --==================================================
--- 3. GIAO DIỆN BẢNG ĐIỀU KHIỂN BAY (FLY CONTROLS)
+-- 3. HỆ THỐNG THÔNG BÁO NOTIFICATION SYSTEM
 --==================================================
-local flyControls = Instance.new("Frame")
-flyControls.Name = "FlyControls"
-flyControls.Size = UDim2.new(0, 65, 0, 130)
-flyControls.Position = UDim2.new(1, -85, 0.5, -65)
-flyControls.BackgroundTransparency = 1
-flyControls.Visible = false
-flyControls.Parent = gui
 
-local function createFlyButton(name, text, color, strokeColor, pos)
-    local btn = Instance.new("TextButton")
-    btn.Name = name
-    btn.Size = UDim2.new(1, 0, 0, 58)
-    btn.Position = pos
-    btn.BackgroundColor3 = Color3.fromRGB(25, 28, 38)
-    btn.Text = text
-    btn.TextColor3 = color
-    btn.TextSize = 13
-    btn.Font = Enum.Font.GothamBold
-    btn.AutoButtonColor = false
-    btn.Parent = flyControls
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = btn
-    
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = strokeColor
-    stroke.Thickness = 1.5
-    stroke.Parent = btn
-    
-    return btn
-end
-
-local upBtn = createFlyButton("UpButton", "▲\nUP", Color3.fromRGB(120, 225, 255), Color3.fromRGB(80, 150, 255), UDim2.new(0, 0, 0, 0))
-local downBtn = createFlyButton("DownButton", "▼\nDOWN", Color3.fromRGB(255, 140, 150), Color3.fromRGB(255, 90, 110), UDim2.new(0, 0, 1, -58))
-
-local isPressingUp = false
-local isPressingDown = false
-
-upBtn.MouseButton1Down:Connect(function() isPressingUp = true end)
-upBtn.MouseButton1Up:Connect(function() isPressingUp = false end)
-upBtn.MouseLeave:Connect(function() isPressingUp = false end)
-downBtn.MouseButton1Down:Connect(function() isPressingDown = true end)
-downBtn.MouseButton1Up:Connect(function() isPressingDown = false end)
-downBtn.MouseLeave:Connect(function() isPressingDown = false end)
-
---==================================================
--- 4. THÔNG BÁO NOTIFICATION ("NO FOUND")
---==================================================
 local notification = Instance.new("Frame")
 notification.Name = "Notification"
-notification.Size = UDim2.new(0, 190, 0, 45)
-notification.Position = UDim2.new(0.5, -95, 0, 70)
+notification.Size = UDim2.new(0, 220, 0, 45)
+notification.Position = UDim2.new(0.5, -110, 0, 70)
 notification.BackgroundColor3 = Color3.fromRGB(24, 24, 30)
 notification.BackgroundTransparency = 0.05
 notification.BorderSizePixel = 0
@@ -138,8 +98,7 @@ notificationCorner.CornerRadius = UDim.new(0, 10)
 notificationCorner.Parent = notification
 
 local notificationStroke = Instance.new("UIStroke")
-notificationStroke.Color = Color3.fromRGB(255, 90, 100)
-notificationStroke.Thickness = 1.2
+notificationStroke.Thickness = 1.5
 notificationStroke.Parent = notification
 
 local notificationIcon = Instance.new("TextLabel")
@@ -147,7 +106,6 @@ notificationIcon.Size = UDim2.new(0, 35, 1, 0)
 notificationIcon.Position = UDim2.new(0, 5, 0, 0)
 notificationIcon.BackgroundTransparency = 1
 notificationIcon.Text = "!"
-notificationIcon.TextColor3 = Color3.fromRGB(255, 100, 110)
 notificationIcon.TextSize = 20
 notificationIcon.Font = Enum.Font.GothamBold
 notificationIcon.Parent = notification
@@ -158,30 +116,41 @@ notificationText.Position = UDim2.new(0, 40, 0, 0)
 notificationText.BackgroundTransparency = 1
 notificationText.Text = "No Found"
 notificationText.TextColor3 = Color3.fromRGB(240, 240, 245)
-notificationText.TextSize = 14
+notificationText.TextSize = 13
 notificationText.Font = Enum.Font.GothamBold
 notificationText.TextXAlignment = Enum.TextXAlignment.Left
 notificationText.Parent = notification
 
 local notificationId = 0
-local function showNoFound(text)
-    notificationId += 1
+local function showNotification(text, statusColor)
+    notificationId = notificationId + 1
     local currentId = notificationId
     notificationText.Text = text or "No Found"
+    
+    if statusColor == "Success" then
+        notificationStroke.Color = Color3.fromRGB(100, 255, 150)
+        notificationIcon.TextColor3 = Color3.fromRGB(100, 255, 150)
+        notificationIcon.Text = "✓"
+    else
+        notificationStroke.Color = Color3.fromRGB(255, 90, 100)
+        notificationIcon.TextColor3 = Color3.fromRGB(255, 100, 110)
+        notificationIcon.Text = "!"
+    end
+    
     notification.Visible = true
     notification.BackgroundTransparency = 1
-    notification.Position = UDim2.new(0.5, -95, 0, 62)
+    notification.Position = UDim2.new(0.5, -110, 0, 62)
     
     TweenService:Create(notification, TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
         BackgroundTransparency = 0.05,
-        Position = UDim2.new(0.5, -95, 0, 70)
+        Position = UDim2.new(0.5, -110, 0, 70)
     }):Play()
     
-    task.delay(1.5, function()
+    task.delay(1.8, function()
         if currentId ~= notificationId then return end
         local tween = TweenService:Create(notification, TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
             BackgroundTransparency = 1,
-            Position = UDim2.new(0.5, -95, 0, 62)
+            Position = UDim2.new(0.5, -110, 0, 62)
         })
         tween:Play()
         tween.Completed:Connect(function()
@@ -193,8 +162,220 @@ local function showNoFound(text)
 end
 
 --==================================================
--- 5. COMMANDS PANEL
+-- 4. BẢNG KEY SYSTEM MINI VÀ HIỆU ỨNG RAINBOW
 --==================================================
+
+local keyFrame = Instance.new("Frame")
+keyFrame.Name = "KeySystemFrame"
+keyFrame.Size = UDim2.new(0, 360, 0, 210)
+keyFrame.Position = UDim2.new(0.5, -180, 0.5, -105)
+keyFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+keyFrame.BorderSizePixel = 0
+keyFrame.Active = true
+keyFrame.Parent = gui
+
+local keyCorner = Instance.new("UICorner")
+keyCorner.CornerRadius = UDim.new(0, 12)
+keyCorner.Parent = keyFrame
+
+local keyStroke = Instance.new("UIStroke")
+keyStroke.Thickness = 1.8
+keyStroke.Parent = keyFrame
+
+-- Kích hoạt vòng lặp đổi màu cầu vồng (RGB Rainbow) lấp lánh cho tất cả viền UI
+RunService.RenderStepped:Connect(function()
+    local hue = (tick() % 4) / 4
+    local rainbowColor = Color3.fromHSV(hue, 0.9, 1)
+    
+    keyStroke.Color = rainbowColor
+    barStroke.Color = rainbowColor
+    if gui:FindFirstChild("CmdsPanel") then
+        gui.CmdsPanel.UIStroke.Color = rainbowColor
+    end
+    if gui:FindFirstChild("MainFrame") then
+        gui.MainFrame.UIStroke.Color = rainbowColor
+    end
+end)
+
+local keyTitle = Instance.new("TextLabel")
+keyTitle.Size = UDim2.new(1, -50, 0, 45)
+keyTitle.Position = UDim2.new(0, 16, 0, 0)
+keyTitle.BackgroundTransparency = 1
+keyTitle.Text = "🔑 KEY SYSTEM REQUIRED"
+keyTitle.TextColor3 = Color3.fromRGB(240, 240, 250)
+keyTitle.TextSize = 14
+keyTitle.Font = Enum.Font.GothamBold
+keyTitle.TextXAlignment = Enum.TextXAlignment.Left
+keyTitle.Parent = keyFrame
+
+local closeKey = Instance.new("TextButton")
+closeKey.Name = "CloseKeyButton"
+closeKey.Size = UDim2.new(0, 30, 0, 30)
+closeKey.Position = UDim2.new(1, -40, 0, 8)
+closeKey.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+closeKey.Text = "✕"
+closeKey.TextColor3 = Color3.fromRGB(255, 110, 115)
+closeKey.TextSize = 13
+closeKey.Font = Enum.Font.GothamBold
+closeKey.AutoButtonColor = false
+closeKey.Parent = keyFrame
+
+local closeKeyCorner = Instance.new("UICorner")
+closeKeyCorner.CornerRadius = UDim.new(0, 6)
+closeKeyCorner.Parent = closeKey
+
+closeKey.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+local keyInput = Instance.new("TextBox")
+keyInput.Name = "KeyTextBox"
+keyInput.Size = UDim2.new(1, -32, 0, 40)
+keyInput.Position = UDim2.new(0, 16, 0, 55)
+keyInput.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
+keyInput.BorderSizePixel = 0
+keyInput.Text = ""
+keyInput.PlaceholderText = "Dán mã Key tại đây..."
+keyInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.TextSize = 13
+keyInput.Font = Enum.Font.GothamMedium
+keyInput.Parent = keyFrame
+
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 8)
+inputCorner.Parent = keyInput
+
+local inputStroke = Instance.new("UIStroke")
+inputStroke.Color = Color3.fromRGB(55, 60, 75)
+inputStroke.Thickness = 1
+inputStroke.Parent = keyInput
+
+local copyBtn = Instance.new("TextButton")
+copyBtn.Name = "CopyLinkButton"
+copyBtn.Size = UDim2.new(0, 155, 0, 38)
+copyBtn.Position = UDim2.new(0, 16, 0, 112)
+copyBtn.BackgroundColor3 = Color3.fromRGB(35, 40, 55)
+copyBtn.Text = "🔗 Copy Link Key"
+copyBtn.TextColor3 = Color3.fromRGB(110, 190, 255)
+copyBtn.TextSize = 13
+copyBtn.Font = Enum.Font.GothamBold
+copyBtn.AutoButtonColor = false
+copyBtn.Parent = keyFrame
+
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 8)
+copyCorner.Parent = copyBtn
+
+local checkBtn = Instance.new("TextButton")
+checkBtn.Name = "CheckKeyButton"
+checkBtn.Size = UDim2.new(0, 155, 0, 38)
+checkBtn.Position = UDim2.new(1, -171, 0, 112)
+checkBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 100)
+checkBtn.Text = "✔ Check Key"
+checkBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+checkBtn.TextSize = 13
+checkBtn.Font = Enum.Font.GothamBold
+checkBtn.AutoButtonColor = false
+checkBtn.Parent = keyFrame
+
+local checkCorner = Instance.new("UICorner")
+checkCorner.CornerRadius = UDim.new(0, 8)
+checkCorner.Parent = checkBtn
+
+local footerLabel = Instance.new("TextLabel")
+footerLabel.Size = UDim2.new(1, -32, 0, 30)
+footerLabel.Position = UDim2.new(0, 16, 1, -40)
+footerLabel.BackgroundTransparency = 1
+footerLabel.Text = "Vượt link để nhận Key hệ thống miễn phí"
+footerLabel.TextColor3 = Color3.fromRGB(130, 135, 145)
+footerLabel.TextSize = 11
+footerLabel.Font = Enum.Font.Gotham
+footerLabel.Parent = keyFrame
+
+--==================================================
+-- 5. LOGIC AUTO-SAVE & KÍCH HOẠT SCRIPT CHÍNH
+--==================================================
+
+local function ActivateMainScript()
+    showNotification("Key Hợp Lệ! Đang khởi động...", "Success")
+    
+    TweenService:Create(keyFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0)
+    }):Play()
+    
+    task.delay(0.3, function()
+        keyFrame:Destroy()
+        bar.Visible = true
+        TweenService:Create(bar, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, -210, 0, 18)
+        }):Play()
+    end)
+end
+
+-- Tính năng đọc file key đã lưu khi mở đầu (Dành cho Delta Executor)
+task.spawn(function()
+    if readfile and isfile and isfile("CmdBar_SaveKey.txt") then
+        local savedKey = readfile("CmdBar_SaveKey.txt")
+        if savedKey == CORRECT_KEY then
+            task.wait(0.2)
+            ActivateMainScript()
+            showNotification("Auto Load thành công!", "Success")
+        end
+    end
+end)
+
+copyBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(KEY_LINK)
+        showNotification("Đã copy Link lấy Key!", "Success")
+    else
+        showNotification("Executor thiếu hàm setclipboard!")
+    end
+end)
+
+checkBtn.MouseButton1Click:Connect(function()
+    if keyInput.Text == CORRECT_KEY then
+        if writefile then
+            writefile("CmdBar_SaveKey.txt", CORRECT_KEY)
+        end
+        ActivateMainScript()
+    else
+        showNotification("Sai khóa bảo mật! Vui lòng thử lại.")
+    end
+end)
+
+-- Hiệu ứng Hover nút bấm
+local function applyHover(btn, normalCol, hoverCol)
+    btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = hoverCol}):Play() end)
+    btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = normalCol}):Play() end)
+end
+applyHover(closeKey, Color3.fromRGB(30, 30, 38), Color3.fromRGB(50, 35, 40))
+applyHover(copyBtn, Color3.fromRGB(35, 40, 55), Color3.fromRGB(45, 55, 75))
+applyHover(checkBtn, Color3.fromRGB(0, 150, 100), Color3.fromRGB(0, 180, 120))
+
+-- Kéo di chuyển bảng Key System
+local keyDragging, keyDragStart, keyStartPos
+keyFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        keyDragging = true keyDragStart = input.Position keyStartPos = keyFrame.Position
+    end
+end)
+keyFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then keyDragging = false end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if keyDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - keyDragStart
+        keyFrame.Position = UDim2.new(keyStartPos.X.Scale, keyStartPos.X.Offset + delta.X, keyStartPos.Y.Scale, keyStartPos.Y.Offset + delta.Y)
+    end
+end)
+
+--==================================================
+-- 6. KHỞI TẠO BẢNG ĐIỀU KHIỂN LỆNH (COMMANDS PANEL GỐC)
+--==================================================
+
 local panel = Instance.new("Frame")
 panel.Name = "CmdsPanel"
 panel.Size = UDim2.new(0, 520, 0, 360)
@@ -209,7 +390,6 @@ panelCorner.CornerRadius = UDim.new(0, 14)
 panelCorner.Parent = panel
 
 local panelStroke = Instance.new("UIStroke")
-panelStroke.Color = Color3.fromRGB(85, 90, 110)
 panelStroke.Thickness = 1.5
 panelStroke.Parent = panel
 
@@ -285,24 +465,28 @@ layout.Padding = UDim.new(0, 7)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = list
 
+-- Khai báo dữ liệu 17 lệnh của bạn (Đã sửa lỗi hiển thị text)
 local commandsList = {
     {":cmds", "Open commands panel"},
     {":speed [1-1000]", "Change player speed"},
     {":jump [1-1000]", "Change jump power"},
     {":fly [1-500]", "Toggle flying mode"},
     {":unfly", "Turn flying mode off"},
+    {":view [name]", "Spectate another player"},
+    {":unview", "Back to self camera"},
+    {":antivoid", "Toggle floor protection at void"},
     {":noclip / :clip", "Walk through walls / Normal"},
     {":god / :ungod", "Godmode (Inf Health) / Normal"},
     {":sit", "Make your character sit"},
     {":fling / :unfling", "Enable / Disable spin fling"},
     {":antilag", "Optimize graphics for low lag"},
     {":antiafk", "Prevent getting kicked for idle"},
-    {":execute", "Open custom Lua script box runner"}, -- Thêm mô tả lệnh mới vào menu bảng lệnh
+    {":execute", "Open custom Lua script box runner"},
     {":reset", "Reset your character"},
     {":rejoin", "Rejoin the server"},
 }
 
-for i, command in ipairs(commandsList) do
+for i, commandData in ipairs(commandsList) do
     local item = Instance.new("Frame")
     item.Size = UDim2.new(1, -5, 0, 42)
     item.BackgroundColor3 = Color3.fromRGB(27, 27, 34)
@@ -318,7 +502,7 @@ for i, command in ipairs(commandsList) do
     cmdLabel.Size = UDim2.new(0, 140, 1, 0)
     cmdLabel.Position = UDim2.new(0, 12, 0, 0)
     cmdLabel.BackgroundTransparency = 1
-    cmdLabel.Text = command[1]
+    cmdLabel.Text = commandData[1]
     cmdLabel.TextColor3 = Color3.fromRGB(105, 195, 255)
     cmdLabel.TextSize = 13
     cmdLabel.Font = Enum.Font.GothamBold
@@ -329,7 +513,7 @@ for i, command in ipairs(commandsList) do
     descLabel.Size = UDim2.new(1, -160, 1, 0)
     descLabel.Position = UDim2.new(0, 155, 0, 0)
     descLabel.BackgroundTransparency = 1
-    descLabel.Text = command[2]
+    descLabel.Text = commandData[2]
     descLabel.TextColor3 = Color3.fromRGB(165, 165, 175)
     descLabel.TextSize = 12
     descLabel.Font = Enum.Font.Gotham
@@ -360,12 +544,12 @@ local function closePanel()
         panel.Visible = false
     end)
 end
-
 close.MouseButton1Click:Connect(closePanel)
 
 --==================================================
--- 6. THU / MỞ CMD BAR
+-- 7. THU / MỞ CMD BAR GỐC
 --==================================================
+
 local collapsed = false
 toggle.MouseButton1Click:Connect(function()
     collapsed = not collapsed
@@ -381,22 +565,45 @@ toggle.MouseButton1Click:Connect(function()
 end)
 
 --==================================================
--- 7. XỬ LÝ CHỨC NĂNG CỦA CÁC LỆNH
+-- 8. TOÀN BỘ CHỨC NĂNG LỆNH GỐC CỦA BẠN (FLY, NOCLIP...)
 --==================================================
+
+local flyControls = Instance.new("Frame")
+flyControls.Name = "FlyControls"
+flyControls.Size = UDim2.new(0, 65, 0, 130)
+flyControls.Position = UDim2.new(1, -85, 0.5, -65)
+flyControls.BackgroundTransparency = 1
+flyControls.Visible = false
+flyControls.Parent = gui
+
+local function createFlyButton(name, text, color, strokeColor, pos)
+    local btn = Instance.new("TextButton")
+    btn.Name = name btn.Size = UDim2.new(1, 0, 0, 58) btn.Position = pos btn.BackgroundColor3 = Color3.fromRGB(25, 28, 38)
+    btn.Text = text btn.TextColor3 = color btn.TextSize = 13 btn.Font = Enum.Font.GothamBold btn.AutoButtonColor = false btn.Parent = flyControls
+    local corner = Instance.new("UICorner") corner.CornerRadius = UDim.new(0, 12) corner.Parent = btn
+    local stroke = Instance.new("UIStroke") stroke.Color = strokeColor stroke.Thickness = 1.5 stroke.Parent = btn
+    return btn
+end
+
+local upBtn = createFlyButton("UpButton", "▲\nUP", Color3.fromRGB(120, 225, 255), Color3.fromRGB(80, 150, 255), UDim2.new(0, 0, 0, 0))
+local downBtn = createFlyButton("DownButton", "▼\nDOWN", Color3.fromRGB(255, 140, 150), Color3.fromRGB(255, 90, 110), UDim2.new(0, 0, 1, -58))
+local isPressingUp = false
+local isPressingDown = false
+upBtn.MouseButton1Down:Connect(function() isPressingUp = true end)
+upBtn.MouseButton1Up:Connect(function() isPressingUp = false end)
+upBtn.MouseLeave:Connect(function() isPressingUp = false end)
+downBtn.MouseButton1Down:Connect(function() isPressingDown = true end)
+downBtn.MouseButton1Up:Connect(function() isPressingDown = false end)
+downBtn.MouseLeave:Connect(function() isPressingDown = false end)
+
 local flying = false
 local flySpeed = 50
 local flyConnection = nil
 local bv, bg = nil, nil
 
 local function stopFly()
-    flying = false
-    flyControls.Visible = false
-    isPressingUp = false
-    isPressingDown = false
-    if flyConnection then
-        flyConnection:Disconnect()
-        flyConnection = nil
-    end
+    flying = false flyControls.Visible = false isPressingUp = false isPressingDown = false
+    if flyConnection then flyConnection:Disconnect() flyConnection = nil end
     local character = player.Character
     if character then
         local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -407,436 +614,225 @@ local function stopFly()
 end
 
 local function startFly(speed)
-    stopFly()
-    flying = true
-    flySpeed = speed or 50
-    flyControls.Visible = true
+    stopFly() flying = true flySpeed = speed or 50 flyControls.Visible = true
     local character = player.Character or player.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
     local humanoid = character:WaitForChild("Humanoid")
     humanoid.PlatformStand = true
-    
-    bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
-    bv.Velocity = Vector3.zero
-    bv.Parent = rootPart
-    
-    bg = Instance.new("BodyGyro")
-    bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
-    bg.P = 10000
-    bg.CFrame = rootPart.CFrame
-    bg.Parent = rootPart
-    
+    bv = Instance.new("BodyVelocity") bv.MaxForce = Vector3.new(1e6, 1e6, 1e6) bv.Velocity = Vector3.zero bv.Parent = rootPart
+    bg = Instance.new("BodyGyro") bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6) bg.P = 10000 bg.CFrame = rootPart.CFrame bg.Parent = rootPart
     flyConnection = RunService.RenderStepped:Connect(function()
-        if not flying or not rootPart or not humanoid or humanoid.Health <= 0 then
-            stopFly()
-            return
-        end
+        if not flying or not rootPart or not humanoid or humanoid.Health <= 0 then stopFly() return end
         bg.CFrame = camera.CFrame
-        local moveDir = humanoid.MoveDirection
-        local verticalDir = 0
-        local verticalSpeed = flySpeed * 1.5
-        
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) or isPressingUp then
-            verticalDir += 1
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or isPressingDown then
-            verticalDir -= 1
-        end
-        
-        local horizontalVel = moveDir * flySpeed
-        local verticalVel = Vector3.new(0, verticalDir * verticalSpeed, 0)
-        bv.Velocity = horizontalVel + verticalVel
+        local moveDir = humanoid.MoveDirection local verticalDir = 0 local verticalSpeed = flySpeed * 1.5
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) or isPressingUp then verticalDir = verticalDir + 1 end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or isPressingDown then verticalDir = verticalDir - 1 end
+        bv.Velocity = (moveDir * flySpeed) + Vector3.new(0, verticalDir * verticalSpeed, 0)
     end)
+end
+
+local viewingPlayer = nil
+local function unviewPlayer()
+    if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+        camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid")
+    end
+    viewingPlayer = nil
+end
+
+local function viewPlayer(targetName)
+    if not targetName or targetName == "" then unviewPlayer() return end
+    local targetPlayer = nil
+    for _, p in ipairs(Players:GetPlayers()) do
+        if string.sub(string.lower(p.Name), 1, #targetName) == string.lower(targetName) or string.sub(string.lower(p.DisplayName), 1, #targetName) == string.lower(targetName) then
+            targetPlayer = p break
+        end
+    end
+    if targetPlayer and targetPlayer.Character then
+        local humanoid = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then camera.CameraSubject = humanoid viewingPlayer = targetPlayer else showNotification("No Humanoid") end
+    else showNotification("Player Not Found") end
+end
+
+Players.PlayerRemoving:Connect(function(p) if p == viewingPlayer then unviewPlayer() end end)
+
+local antiVoidPart = nil
+local antiVoidConnection = nil
+local function toggleAntiVoid()
+    if antiVoidPart then
+        if antiVoidConnection then antiVoidConnection:Disconnect() antiVoidConnection = nil end
+        antiVoidPart:Destroy() antiVoidPart = nil
+    else
+        local voidY = workspace.FallenPartsDestroyHeight + 15
+        antiVoidPart = Instance.new("Part") antiVoidPart.Name = "CmdBarAntiVoid" antiVoidPart.Size = Vector3.new(2000, 5, 2000)
+        antiVoidPart.Position = Vector3.new(0, voidY, 0) antiVoidPart.Anchored = true antiVoidPart.CanCollide = true
+        antiVoidPart.Transparency = 0.5 antiVoidPart.Color = Color3.fromRGB(255, 60, 60) antiVoidPart.Material = Enum.Material.Neon antiVoidPart.Parent = workspace
+        antiVoidConnection = RunService.Heartbeat:Connect(function()
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart antiVoidPart.Position = Vector3.new(hrp.Position.X, voidY, hrp.Position.Z)
+                if hrp.Position.Y <= voidY + 5 then hrp.AssemblyLinearVelocity = Vector3.new(0, 120, 0) end
+            end
+        end)
+    end
 end
 
 local noclip = false
 local noclipConn = nil
 local function setNoclip(state)
-    noclip = state
-    if noclipConn then
-        noclipConn:Disconnect()
-        noclipConn = nil
-    end
-    if noclip then
-        noclipConn = RunService.Stepped:Connect(function()
-            local character = player.Character
-            if character then
-                for _, part in ipairs(character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        end)
-    end
+    noclip = state if noclipConn then noclipConn:Disconnect() noclipConn = nil end
+    if noclip then noclipConn = RunService.Stepped:Connect(function()
+        if player.Character then for _, part in ipairs(player.Character:GetDescendants()) do if part:IsA("BasePart") then part.CanCollide = false end end end
+    end) end
 end
 
 local godConn = nil
 local function setGodMode(state)
-    if godConn then
-        godConn:Disconnect()
-        godConn = nil
-    end
-    if state then
-        godConn = RunService.Stepped:Connect(function()
-            local character = player.Character
-            if character then
-                local humanoid = character:FindFirstChildOfClass("Humanoid")
-                if humanoid then
-                    humanoid.Health = humanoid.MaxHealth
-                end
-            end
-        end)
-    end
+    if godConn then godConn:Disconnect() godConn = nil end
+    if state then godConn = RunService.Stepped:Connect(function()
+        if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+            player.Character:FindFirstChildOfClass("Humanoid").Health = player.Character:FindFirstChildOfClass("Humanoid").MaxHealth
+        end
+    end) end
 end
 
 local flinging = false
 local flingConn = nil
 local function setFling(state)
-    flinging = state
-    if flingConn then
-        flingConn:Disconnect()
-        flingConn = nil
-    end
-    if flinging then
-        flingConn = RunService.Heartbeat:Connect(function()
-            local character = player.Character
-            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-            if rootPart then
-                rootPart.Velocity = Vector3.new(0, 10000, 0)
-                rootPart.RotVelocity = Vector3.new(10000, 10000, 10000)
-            end
-        end)
-    end
+    flinging = state if flingConn then flingConn:Disconnect() flingConn = nil end
+    if flinging then flingConn = RunService.Heartbeat:Connect(function()
+        local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if rootPart then rootPart.Velocity = Vector3.new(0, 10000, 0) rootPart.RotVelocity = Vector3.new(10000, 10000, 10000) end
+    end) end
 end
 
 local function enableAntiLag()
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 9e9
+    Lighting.GlobalShadows = false Lighting.FogEnd = 9e9
     for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.Material = Enum.Material.SmoothPlastic
-            v.Reflectance = 0
-        elseif v:IsA("Decal") or v:IsA("Texture") then
-            v:Destroy()
-        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-            v.Enabled = false
-        end
+        if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic v.Reflectance = 0
+        elseif v:IsA("Decal") or v:IsA("Texture") then v:Destroy()
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Enabled = false end
     end
 end
 
 local antiAfkEnabled = false
 local function enableAntiAfk()
-    if antiAfkEnabled then return end
-    antiAfkEnabled = true
+    if antiAfkEnabled then return end antiAfkEnabled = true
     local virtualUser = game:GetService("VirtualUser")
-    player.Idled:Connect(function()
-        virtualUser:CaptureController()
-        virtualUser:ClickButton2(Vector2.new())
-    end)
+    player.Idled:Connect(function() virtualUser:CaptureController() virtualUser:ClickButton2(Vector2.new()) end)
 end
 
--- HÀM ĐẶC BIỆT: KHỞI TẠO BẢNG EXECUTE KHI GÕ LỆNH :EXECUTE
 local function openExecutePanel()
-    if gui:FindFirstChild("MainFrame") then
-        gui:FindFirstChild("MainFrame").Visible = true
-        return
-    end
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 680, 0, 420)
-    mainFrame.Position = UDim2.new(0.5, -340, 0.5, -210)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 22)
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Active = true
-    mainFrame.Draggable = true
-    mainFrame.Parent = gui
-
-    local mainCorner = Instance.new("UICorner")
-    mainCorner.CornerRadius = UDim.new(0, 16)
-    mainCorner.Parent = mainFrame
-
-    local mainStroke = Instance.new("UIStroke")
-    mainStroke.Thickness = 1.5
-    mainStroke.Color = Color3.fromRGB(0, 102, 255)
-    mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    mainStroke.Parent = mainFrame
-
-    local pTopBar = Instance.new("Frame")
-    pTopBar.Name = "TopBar"
-    pTopBar.Size = UDim2.new(1, 0, 0, 55)
-    pTopBar.BackgroundColor3 = Color3.fromRGB(18, 24, 38)
-    pTopBar.BorderSizePixel = 0
-    pTopBar.Parent = mainFrame
-
-    local pTopBarCorner = Instance.new("UICorner")
-    pTopBarCorner.CornerRadius = UDim.new(0, 16)
-    pTopBarCorner.Parent = pTopBar
-
-    local pTopBarFix = Instance.new("Frame")
-    pTopBarFix.Size = UDim2.new(1, 0, 0, 20)
-    pTopBarFix.Position = UDim2.new(0, 0, 1, -20)
-    pTopBarFix.BackgroundColor3 = Color3.fromRGB(18, 24, 38)
-    pTopBarFix.BorderSizePixel = 0
-    pTopBarFix.Parent = pTopBar
-
-    local pTitleLabel = Instance.new("TextLabel")
-    pTitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-    pTitleLabel.Position = UDim2.new(0, 20, 0, 0)
-    pTitleLabel.BackgroundTransparency = 1
-    pTitleLabel.Text = "Create : UyVuScript"
-    pTitleLabel.TextColor3 = Color3.fromRGB(0, 180, 255)
-    pTitleLabel.Font = Enum.Font.GothamBold
-    pTitleLabel.TextSize = 16
-    pTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    pTitleLabel.Parent = pTopBar
-
-    local pCloseButton = Instance.new("TextButton")
-    pCloseButton.Size = UDim2.new(0, 32, 0, 32)
-    pCloseButton.Position = UDim2.new(1, -45, 0.5, -16)
-    pCloseButton.BackgroundColor3 = Color3.fromRGB(35, 30, 40)
-    pCloseButton.Text = "✕"
-    pCloseButton.TextColor3 = Color3.fromRGB(255, 100, 100)
-    pCloseButton.Font = Enum.Font.GothamBold
-    pCloseButton.TextSize = 14
-    pCloseButton.Parent = pTopBar
-
-    local pCloseCorner = Instance.new("UICorner")
-    pCloseCorner.CornerRadius = UDim.new(0, 8)
-    pCloseCorner.Parent = pCloseButton
-
-    pCloseButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = false
-    end)
-
-    local scrFrame = Instance.new("ScrollingFrame")
-    scrFrame.Size = UDim2.new(1, -40, 1, -145)
-    scrFrame.Position = UDim2.new(0, 20, 0, 75)
-    scrFrame.BackgroundColor3 = Color3.fromRGB(7, 9, 15)
-    scrFrame.BorderSizePixel = 0
-    scrFrame.ScrollBarThickness = 4
-    scrFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 102, 255)
-    scrFrame.CanvasSize = UDim2.new(0, 0, 0, 1000)
-    scrFrame.Parent = mainFrame
-
-    local scrCorner = Instance.new("UICorner")
-    scrCorner.CornerRadius = UDim.new(0, 10)
-    scrCorner.Parent = scrFrame
-
-    local pCodeBox = Instance.new("TextBox")
-    pCodeBox.Size = UDim2.new(1, -20, 1, 0)
-    pCodeBox.Position = UDim2.new(0, 10, 0, 0)
-    pCodeBox.BackgroundTransparency = 1
-    pCodeBox.Text = "-- Nhập script Lua của bạn ở đây..."
-    pCodeBox.TextColor3 = Color3.fromRGB(150, 210, 255)
-    pCodeBox.Font = Enum.Font.Code
-    pCodeBox.TextSize = 14
-    pCodeBox.TextXAlignment = Enum.TextXAlignment.Left
-    pCodeBox.TextYAlignment = Enum.TextYAlignment.Top
-    pCodeBox.ClearTextOnFocus = false
-    pCodeBox.MultiLine = true
-    pCodeBox.Parent = scrFrame
-
-    local btnContainer = Instance.new("Frame")
-    btnContainer.Size = UDim2.new(1, -40, 0, 45)
-    btnContainer.Position = UDim2.new(0, 20, 1, -65)
-    btnContainer.BackgroundTransparency = 1
-    btnContainer.Parent = mainFrame
-
-    local pExecBtn = Instance.new("TextButton")
-    pExecBtn.Size = UDim2.new(0, 430, 1, 0)
-    pExecBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 255)
-    pExecBtn.Text = "EXECUTE SCRIPT"
-    pExecBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    pExecBtn.Font = Enum.Font.GothamBold
-    pExecBtn.TextSize = 13
-    pExecBtn.Parent = btnContainer
-
-    local pExecCorner = Instance.new("UICorner")
-    pExecCorner.CornerRadius = UDim.new(0, 10)
-    pExecCorner.Parent = pExecBtn
-
-    local pClearBtn = Instance.new("TextButton")
-    pClearBtn.Size = UDim2.new(1, -445, 1, 0)
-    pClearBtn.Position = UDim2.new(0, 445, 0, 0)
-    pClearBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 30)
-    pClearBtn.Text = "CLEAR"
-    pClearBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
-    pClearBtn.Font = Enum.Font.GothamBold
-    pClearBtn.TextSize = 13
-    pClearBtn.Parent = btnContainer
-
-    local pClearCorner = Instance.new("UICorner")
-    pClearCorner.CornerRadius = UDim.new(0, 10)
-    pClearCorner.Parent = pClearBtn
-
+    if gui:FindFirstChild("MainFrame") then gui:FindFirstChild("MainFrame").Visible = true return end
+    local mainFrame = Instance.new("Frame") mainFrame.Name = "MainFrame" mainFrame.Size = UDim2.new(0, 680, 0, 420) mainFrame.Position = UDim2.new(0.5, -340, 0.5, -210)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 22) mainFrame.BorderSizePixel = 0 mainFrame.Active = true mainFrame.Draggable = true mainFrame.Parent = gui
+    local mainCorner = Instance.new("UICorner") mainCorner.CornerRadius = UDim.new(0, 16) mainCorner.Parent = mainFrame
+    local mainStroke = Instance.new("UIStroke") mainStroke.Thickness = 1.5 mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border mainStroke.Parent = mainFrame
+    local pTopBar = Instance.new("Frame") pTopBar.Name = "TopBar" pTopBar.Size = UDim2.new(1, 0, 0, 55) pTopBar.BackgroundColor3 = Color3.fromRGB(18, 24, 38) pTopBar.BorderSizePixel = 0 pTopBar.Parent = mainFrame
+    local pTopBarCorner = Instance.new("UICorner") pTopBarCorner.CornerRadius = UDim.new(0, 16) pTopBarCorner.Parent = pTopBar
+    local pTopBarFix = Instance.new("Frame") pTopBarFix.Size = UDim2.new(1, 0, 0, 20) pTopBarFix.Position = UDim2.new(0, 0, 1, -20) pTopBarFix.BackgroundColor3 = Color3.fromRGB(18, 24, 38) pTopBarFix.BorderSizePixel = 0 pTopBarFix.Parent = pTopBar
+    local pTitleLabel = Instance.new("TextLabel") pTitleLabel.Size = UDim2.new(0.7, 0, 1, 0) pTitleLabel.Position = UDim2.new(0, 20, 0, 0) pTitleLabel.BackgroundTransparency = 1 pTitleLabel.Text = "Create : UyVuScript" pTitleLabel.TextColor3 = Color3.fromRGB(0, 180, 255) pTitleLabel.Font = Enum.Font.GothamBold pTitleLabel.TextSize = 16 pTitleLabel.TextXAlignment = Enum.TextXAlignment.Left pTitleLabel.Parent = pTopBar
+    local pCloseButton = Instance.new("TextButton") pCloseButton.Size = UDim2.new(0, 32, 0, 32) pCloseButton.Position = UDim2.new(1, -45, 0.5, -16) pCloseButton.BackgroundColor3 = Color3.fromRGB(35, 30, 40) pCloseButton.Text = "✕" pCloseButton.TextColor3 = Color3.fromRGB(255, 100, 100) pCloseButton.Font = Enum.Font.GothamBold pCloseButton.TextSize = 14 pCloseButton.Parent = pTopBar
+    local pCloseCorner = Instance.new("UICorner") pCloseCorner.CornerRadius = UDim.new(0, 8) pCloseCorner.Parent = pCloseButton
+    pCloseButton.MouseButton1Click:Connect(function() mainFrame.Visible = false end)
+    local scrFrame = Instance.new("ScrollingFrame") scrFrame.Size = UDim2.new(1, -40, 1, -145) scrFrame.Position = UDim2.new(0, 20, 0, 75) scrFrame.BackgroundColor3 = Color3.fromRGB(7, 9, 15) scrFrame.BorderSizePixel = 0 scrFrame.ScrollBarThickness = 4 scrFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 102, 255) scrFrame.CanvasSize = UDim2.new(0, 0, 0, 1000) scrFrame.Parent = mainFrame
+    local scrCorner = Instance.new("UICorner") scrCorner.CornerRadius = UDim.new(0, 10) scrCorner.Parent = scrFrame
+    local pCodeBox = Instance.new("TextBox") pCodeBox.Size = UDim2.new(1, -20, 1, 0) pCodeBox.Position = UDim2.new(0, 10, 0, 0) pCodeBox.BackgroundTransparency = 1 pCodeBox.Text = "-- Nhập script Lua của bạn ở đây..." pCodeBox.TextColor3 = Color3.fromRGB(150, 210, 255) pCodeBox.Font = Enum.Font.Code pCodeBox.TextSize = 14 pCodeBox.TextXAlignment = Enum.TextXAlignment.Left pCodeBox.TextYAlignment = Enum.TextYAlignment.Top pCodeBox.ClearTextOnFocus = false pCodeBox.MultiLine = true pCodeBox.Parent = scrFrame
+    local btnContainer = Instance.new("Frame") btnContainer.Size = UDim2.new(1, -40, 0, 45) btnContainer.Position = UDim2.new(0, 20, 1, -65) btnContainer.BackgroundTransparency = 1 btnContainer.Parent = mainFrame
+    local pExecBtn = Instance.new("TextButton") pExecBtn.Size = UDim2.new(0, 430, 1, 0) pExecBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 255) pExecBtn.Text = "EXECUTE SCRIPT" pExecBtn.TextColor3 = Color3.fromRGB(255, 255, 255) pExecBtn.Font = Enum.Font.GothamBold pExecBtn.TextSize = 13 pExecBtn.Parent = btnContainer
+    local pExecCorner = Instance.new("UICorner") pExecCorner.CornerRadius = UDim.new(0, 10) pExecCorner.Parent = pExecBtn
+    local pClearBtn = Instance.new("TextButton") pClearBtn.Size = UDim2.new(1, -445, 1, 0) pClearBtn.Position = UDim2.new(0, 445, 0, 0) pClearBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 30) pClearBtn.Text = "CLEAR" pClearBtn.TextColor3 = Color3.fromRGB(255, 120, 120) pClearBtn.Font = Enum.Font.GothamBold pClearBtn.TextSize = 13 pClearBtn.Parent = btnContainer
+    local pClearCorner = Instance.new("UICorner") pClearCorner.CornerRadius = UDim.new(0, 10) pClearCorner.Parent = pClearBtn
     pExecBtn.MouseButton1Click:Connect(function()
         if loadstring and pCodeBox.Text ~= "" then
             local func, err = loadstring(pCodeBox.Text)
-            if func then
-                setfenv(func, getfenv())
-                task.spawn(func)
-            else
-                warn("[Execute Error]: " .. tostring(err))
-            end
+            if func then setfenv(func, getfenv()) task.spawn(func) else warn("[Execute Error]: " .. tostring(err)) end
         end
     end)
-
-    pClearBtn.MouseButton1Click:Connect(function()
-        pCodeBox.Text = ""
-    end)
-    
-    local function applyHover(btn, normalCol, hoverCol)
-        btn.MouseEnter:Connect(function() TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = hoverCol}):Play() end)
-        btn.MouseLeave:Connect(function() TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = normalCol}):Play() end)
-    end
+    pClearBtn.MouseButton1Click:Connect(function() pCodeBox.Text = "" end)
     applyHover(pExecBtn, Color3.fromRGB(0, 102, 255), Color3.fromRGB(0, 130, 255))
     applyHover(pClearBtn, Color3.fromRGB(35, 20, 30), Color3.fromRGB(55, 25, 35))
 end
 
-player.CharacterAdded:Connect(function()
-    stopFly()
-    setNoclip(false)
-    setGodMode(false)
-    setFling(false)
-end)
+player.CharacterAdded:Connect(function() stopFly() unviewPlayer() setNoclip(false) setGodMode(false) setFling(false) end)
 
 --==================================================
--- 8. BỘ LỌC VÀ THỰC THI LỆNH
+-- 9. BỘ LỌC VÀ THỰC THI LỆNH LỆNH FOUCSLOST
 --==================================================
+
 local validCommands = {
-    [":cmds"] = true,
-    [":speed"] = true,
-    [":jump"] = true,
-    [":fly"] = true,
-    [":unfly"] = true,
-    [":noclip"] = true,
-    [":clip"] = true,
-    [":god"] = true,
-    [":ungod"] = true,
-    [":sit"] = true,
-    [":fling"] = true,
-    [":unfling"] = true,
-    [":antilag"] = true,
-    [":antiafk"] = true,
-    [":execute"] = true, -- Thêm lệnh mới vào hệ thống lọc
-    [":reset"] = true,
-    [":rejoin"] = true,
+    [":cmds"] = true, [":speed"] = true, [":jump"] = true, [":fly"] = true, [":unfly"] = true, [":view"] = true, [":unview"] = true,
+    [":antivoid"] = true, [":noclip"] = true, [":clip"] = true, [":god"] = true, [":ungod"] = true, [":sit"] = true, [":fling"] = true,
+    [":unfling"] = true, [":antilag"] = true, [":antiafk"] = true, [":execute"] = true, [":reset"] = true, [":rejoin"] = true,
 }
 
 box.FocusLost:Connect(function(enterPressed)
     if not enterPressed then return end
     local rawText = string.lower(string.gsub(box.Text, "^%s*(.-)%s*$", "%1"))
     if rawText == "" then return end
-    
     local args = string.split(rawText, " ")
     local command = args[1]
     local value = tonumber(args[2])
+    local targetArg = args[2]
     
-    if not string.find(command, "^:") then
-        command = ":" .. command
-    end
-    
+    if not string.find(command, "^:") then command = ":" .. command end
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     
-    if command == ":cmds" then
-        openPanel()
-    elseif command == ":execute" then -- XỬ LÝ LỆNH :EXECUTE -> MỞ BẢNG CHẠY SCRIPT CON
-        openExecutePanel()
-    elseif command == ":speed" then
-        if humanoid then
-            humanoid.WalkSpeed = value and math.clamp(value, 1, 1000) or 16
-        end
-    elseif command == ":jump" then
-        if humanoid then
-            humanoid.UseJumpPower = true
-            humanoid.JumpPower = value and math.clamp(value, 1, 1000) or 50
-        end
-    elseif command == ":fly" then
-        startFly(value and math.clamp(value, 1, 500) or 50)
-    elseif command == ":unfly" then
-        stopFly()
-    elseif command == ":noclip" then
-        setNoclip(true)
-    elseif command == ":clip" then
-        setNoclip(false)
-    elseif command == ":god" then
-        setGodMode(true)
-    elseif command == ":ungod" then
-        setGodMode(false)
-    elseif command == ":sit" then
-        if humanoid then humanoid.Sit = true end
-    elseif command == ":fling" then
-        setFling(true)
-    elseif command == ":unfling" then
-        setFling(false)
-    elseif command == ":antilag" then
-        enableAntiLag()
-    elseif command == ":antiafk" then
-        enableAntiAfk()
-    elseif command == ":reset" then
-        stopFly()
-        setNoclip(false)
-        setGodMode(false)
-        setFling(false)
-        if humanoid then humanoid.Health = 0 end
-    elseif command == ":rejoin" then
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
-    elseif validCommands[command] then
-        print("Command executed:", command)
-    else
-        showNoFound("No Found")
-    end
+    if command == ":cmds" then openPanel()
+    elseif command == ":execute" then openExecutePanel()
+    elseif command == ":speed" then if humanoid then humanoid.WalkSpeed = value and math.clamp(value, 1, 1000) or 16 end
+    elseif command == ":jump" then if humanoid then humanoid.UseJumpPower = true humanoid.JumpPower = value and math.clamp(value, 1, 1000) or 50 end
+    elseif command == ":fly" then startFly(value and math.clamp(value, 1, 500) or 50)
+    elseif command == ":unfly" then stopFly()
+    elseif command == ":view" then viewPlayer(targetArg)
+    elseif command == ":unview" then unviewPlayer()
+    elseif command == ":antivoid" then toggleAntiVoid()
+    elseif command == ":noclip" then setNoclip(true)
+    elseif command == ":clip" then setNoclip(false)
+    elseif command == ":god" then setGodMode(true)
+    elseif command == ":ungod" then setGodMode(false)
+    elseif command == ":sit" then if humanoid then humanoid.Sit = true end
+    elseif command == ":fling" then setFling(true)
+    elseif command == ":unfling" then setFling(false)
+    elseif command == ":antilag" then enableAntiLag()
+    elseif command == ":antiafk" then enableAntiAfk()
+    elseif command == ":reset" then stopFly() unviewPlayer() setNoclip(false) setGodMode(false) setFling(false) if humanoid then humanoid.Health = 0 end
+    elseif command == ":rejoin" then TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+    elseif validCommands[command] then print("Command executed:", command)
+    else showNotification("No Found") end
     box.Text = ""
 end)
 
---==================================================
--- 9. PHÍM TẮT "/" ĐỂ NHẬP
---==================================================
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
-    if input.KeyCode == Enum.KeyCode.Slash and not collapsed then
-        task.defer(function()
-            box:CaptureFocus()
-        end)
+    if input.KeyCode == Enum.KeyCode.Slash and not collapsed and bar.Visible then
+        task.defer(function() box:CaptureFocus() end)
     end
 end)
 
 --==================================================
--- 10. DRAGGABLE (KÉO NĂM PANEL & CMD BAR)
+-- 10. DRAGGABLE LOGIC (KÉO PANEL & CMD BAR)
 --==================================================
+
 local dragging, dragStart, startPosition
 header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPosition = panel.Position
+        dragging = true dragStart = input.Position startPosition = panel.Position
     end
 end)
-
 header.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
 end)
 
 local barDragging, barDragStart, barStartPosition
 bar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         if input.Target == toggle then return end
-        barDragging = true
-        barDragStart = input.Position
-        barStartPosition = bar.Position
+        barDragging = true barDragStart = input.Position barStartPosition = bar.Position
     end
 end)
-
 bar.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        barDragging = false
-    end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then barDragging = false end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
@@ -851,7 +847,3 @@ UserInputService.InputChanged:Connect(function(input)
         end
     end
 end)
-
--- ANIMATION XUẤT HIỆN BAN ĐẦU
-bar.Position = UDim2.new(0.5, -210, 0, -55)
-TweenService:Create(bar, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -210, 0, 18)}):Play()
